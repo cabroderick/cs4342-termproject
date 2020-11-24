@@ -38,7 +38,7 @@ def print_individual_predictors(dataset):
     plt.ylabel("Quality")
     plt.title("Predictors vs Quality")
 
-    plt.xticks(x_pos, x)
+    plt.xticks(x_pos, x, rotation='vertical')
 
     plt.show()
 
