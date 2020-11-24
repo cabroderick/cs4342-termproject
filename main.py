@@ -17,19 +17,21 @@ def print_individual_predictors(dataset):
     results = []
 
     for predictor in predictors:
-        current_predictor = dataset[predictor]
-        current_model = sm.OLS(quality, current_predictor).fit()
-        results.append(current_model.fvalue)
+        if (predictor != 'quality'):
+            current_predictor = dataset[predictor]
+            current_model = sm.OLS(quality, current_predictor).fit()
+            results.append(current_model.fvalue)
 
-        print("T-values: {}".format(current_model.tvalues))
-        print("P-value: {}".format(current_model.f_pvalue))
-        print("F-test: {} ".format(current_model.fvalue))
-        print("F-test: {} ".format(current_model.rsquared))
-        print("-----------------------\n")
-
+            print("T-values: {}".format(current_model.tvalues))
+            print("P-value: {}".format(current_model.f_pvalue))
+            print("F-test: {} ".format(current_model.fvalue))
+            print("F-test: {} ".format(current_model.rsquared))
+            print("-----------------------\n")
+        
     plt.style.use('ggplot')
     x = predictors
-    x_pos = [i for i, _ in enumerate(x)]
+    x = x.drop(labels=['quality'])
+    x_pos = [str(x[i]) for i in range(0, len(x))]
 
     plt.bar(x_pos, results, color='purple')
     plt.xlabel("Predictors")
