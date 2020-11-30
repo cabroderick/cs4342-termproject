@@ -10,6 +10,7 @@ def main ():
     white_wine = load_csv(str(cwd) + "/winequality-white.csv")
 
     print_individual_predictors(red_wine)
+    #knn_classifier(red_wine)
 
 def print_individual_predictors(dataset):
     predictors = dataset.columns
@@ -42,6 +43,21 @@ def print_individual_predictors(dataset):
 
     plt.show()
 
+def knn_classifier(dataset):
+    # split the data into test and training datasets
+    X = dataset[['alcohal'],['pH']]
+    y = dataset.target
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.30)
+
+    # reshape the data
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    scaler.fit(X_train)
+    X_train = scaler.transform(X_train)
+    X_test = scaler.transform(X_test)
+    
+    #apply the classifier
 
 def load_csv(filename):
     return pd.read_csv(filename, sep=';')
