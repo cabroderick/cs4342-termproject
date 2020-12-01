@@ -1,5 +1,7 @@
 import pandas as pd
 import sklearn as sk
+from sklearn import model_selection
+from sklearn import neighbors
 import pathlib
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
@@ -9,8 +11,9 @@ def main ():
     red_wine = load_csv(str(cwd) + "/winequality-red.csv")
     white_wine = load_csv(str(cwd) + "/winequality-white.csv")
 
-    print_individual_predictors(red_wine)
-    #knn_classifier(red_wine)
+    #print_individual_predictors(red_wine)
+    #print_individual_predictors(white_wine)
+    knn_classifier(red_wine)
 
 def print_individual_predictors(dataset):
     predictors = dataset.columns
@@ -44,20 +47,18 @@ def print_individual_predictors(dataset):
     plt.show()
 
 def knn_classifier(dataset):
-    # split the data into test and training datasets
-    X = dataset[['alcohal'],['pH']]
-    y = dataset.target
-    from sklearn.model_selection import train_test_split
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.30)
+    # split data into modeling and target variables
+    X = dataset.drop(['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','sulphates','quality'], axis=1)
+    y = dataset.quality
 
-    # reshape the data
-    from sklearn.preprocessing import StandardScaler
-    scaler = StandardScaler()
-    scaler.fit(X_train)
-    X_train = scaler.transform(X_train)
-    X_test = scaler.transform(X_test)
-    
-    #apply the classifier
+    # train-test split
+    X_train, X_test, y_train, y_test = sk.model_selection.train_test_split(X, y, random_state=42)
+    # instantiate the model with 5 neighbors
+    knn = sk.neighbors.KNeighborsClassifier(n_neighbors=5)
+    # fit the model on the training data
+    knn.fit(X_train, y_train)
+    # see how the model performs
+    print(knn.score(X_test, y_test))
 
 def load_csv(filename):
     return pd.read_csv(filename, sep=';')
