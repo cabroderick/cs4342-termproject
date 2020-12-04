@@ -3,6 +3,7 @@ import sklearn as sk
 import numpy as np
 from sklearn import model_selection
 from sklearn import neighbors
+from sklearn import ensemble
 import pathlib
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
@@ -18,9 +19,10 @@ def main ():
     #print_individual_predictors(white_wine)
 
     # run the classifiers
-    #knn_classifier(dataset=red_wine, n_neighbors=50)
-    ensemble_classifier(dataset=red_wine)
+    knn_classifier(red_wine, 50)
+    #ensemble_classifier(dataset=red_wine)
 
+# prints the weight of each of the predictors
 def print_individual_predictors(dataset):
     predictors = dataset.columns
     quality = dataset["quality"]
@@ -52,21 +54,22 @@ def print_individual_predictors(dataset):
 
     plt.show()
 
-def isolate_predictors(dataset, color):
-    if color == "red":
-        return dataset.drop(['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','sulphates','quality'], axis=1)
-        # isolate predictors for red wine dataset
-    if color == "white":
-        pass
-        # isolate predictors for white wine dataset
-
-def knn_classifier(dataset, n_neighbors):
-    # split data into modeling and target variables
-    X = isolate_predictors(dataset, "red")
+# perform train-test split
+def tt_split(dataset, rs):
+    X = isolate_predictors(dataset)
     y = dataset.quality
+    X_train, X_test, y_train, y_test = sk.model_selection.train_test_split(X, y, random_state=rs)
+    return X_train, X_test, y_train, y_test
 
+# isolate only the predictors from the dataset
+def isolate_predictors(dataset):
+    return dataset.drop('quality',axis=1)
+
+# perform knn classification
+def knn_classifier(dataset, n_neighbors):
     # train-test split
-    X_train, X_test, y_train, y_test = sk.model_selection.train_test_split(X, y, random_state=42)
+    X_train, X_test, y_train, y_test = tt_split(dataset, 42)
+    
     # instantiate the model with 5 neighbors
     knn = sk.neighbors.KNeighborsClassifier(n_neighbors)
     # fit the model on the training data
@@ -74,44 +77,17 @@ def knn_classifier(dataset, n_neighbors):
     # see how the model performs
     print(knn.score(X_test, y_test))
 
-    # set up the color map
-    cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA','#00AAFF'])
-    cmap_bold = ListedColormap(['#FF0000', '#00FF00','#00AAFF'])
-
-    # # calculate min, max and limits
-    # x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-    # y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
-    # xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-    # np.arange(y_min, y_max, h))
-
-    # # predict class using data and kNN classifier
-    # Z = knn.predict(np.c_[xx.ravel(), yy.ravel()])
-
-    # # Put the result into a color plot
-    # Z = Z.reshape(xx.shape)
-    # plt.figure()
-    # plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
-
-    # # Plot also the training points
-    # plt.scatter(X[:, 0], X[:, 1], c=y, cmap=cmap_bold)
-    # plt.xlim(xx.min(), xx.max())
-    # plt.ylim(yy.min(), yy.max())
-    # plt.title("KNN Classification (k = %i)" % (n_neighbors))
-    # plt.show()
-    
+# perform ensemble classification
 def ensemble_classifier(dataset):
-    # split data into modeling and target variables
-    X = dataset.drop(['fixed acidity','volatile acidity','citric acid','residual sugar','chlorides','free sulfur dioxide','total sulfur dioxide','density','sulphates','quality'], axis=1)
-    y = dataset.quality
-
     # train-test split
-    X_train, X_test, y_train, y_test = sk.model_selection.train_test_split(X, y, random_state=42)
+    X_train, X_test, y_train, y_test = tt_split(dataset, 50)
 
     # instantiate the tree based cluster
     ens = sk.ensemble.ExtraTreesClassifier(n_estimators=100)
     ens.fit(X_train, y_train)
     print(ens.score(X_test, y_test))
 
+# loads a csv file
 def load_csv(filename):
     return pd.read_csv(filename, sep=';')
 
