@@ -74,6 +74,7 @@ def knn_classifier(dataset, n_neighbors):
     knn = sk.neighbors.KNeighborsClassifier(n_neighbors)
     # fit the model on the training data
     knn.fit(X_train, y_train)
+    visualize(X, y, knn, "KNN")
     # see how the model performs
     print(knn.score(X_test, y_test))
 
@@ -86,6 +87,42 @@ def ensemble_classifier(dataset):
     ens = sk.ensemble.ExtraTreesClassifier(n_estimators=100)
     ens.fit(X_train, y_train)
     print(ens.score(X_test, y_test))
+
+# model = model
+# plot_title = string name (for descriptive plots)
+def visualize(X, y, model, plot_title):
+    h = 0.02
+
+    # set up the color map (3-most red, 9- most green
+    # cmap_light = ListedColormap(['#FFAAAA', '#AAFFAA'])
+    cmap_light = ListedColormap(['#FF0000', '#D42B00', '#AA5500', '#808000', '#55AA00', '#2BD400', '#00FF00'])
+    cmap_bold = ListedColormap(['#FF0000', '#D42B00', '#AA5500', '#808000', '#55AA00', '#2BD400', '#00FF00'])
+
+    # calculate min, max and limits
+
+    # whats broken is that the X range X[:, 0] does not work for some reason. This logic will also only
+    # work with two parameters as we are graphing a 2d grid at the moment. make it work with just two predictors and then
+    # we can go from there. its creating the bounds of the plot by looking at the range of values for the two predictors
+    # it then overlays the predictions onto this range
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+
+    # predict class using data and kNN classifier
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+
+    # Put the result into a color plot
+    Z = Z.reshape(xx.shape)
+    plt.figure()
+    plt.pcolormesh(xx, yy, Z, cmap=cmap_light)
+
+    # Plot also the training points
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=cmap_bold)
+    plt.xlim(xx.min(), xx.max())
+    plt.ylim(yy.min(), yy.max())
+    plt.title("{}".format(plot_title))
+    plt.show()
 
 # loads a csv file
 def load_csv(filename):
