@@ -1,0 +1,33 @@
+Identification/Data Vis/Cleaning Section:
+- We took scores of a linear regression for each individual predictor to determine which predictors are most influential
+    - Graphed these scores
+- We then visualized each of the classifiers using these identified predictors
+    - See default scores below, Ensemble clearly the best initially
+    - After visualization we were able to better tune each model
+
+All Features: -----------------------------------------
+Scores of each classifier (Default settings of all)
+KNN Score: 0.5175
+Ensemble score: 0.7225
+SVM Score: 0.5975
+
+
+Restricted Features: ----------------------------------
+Current best:
+KNN Score: 0.6575
+Ensemble score: 0.74     - Removing parameters lowers score
+SVM Score: 0.5975        - Removing parameters lowers score
+
+
+
+
+KNN specific notes:
+Score of KNN with hyper-parameter tuning --------------------------------
+{'weights': 'distance', 'leaf_size': 2, 'algorithm': 'brute'}
+KNN Score: 0.6472060050041701      - REALLY BIG JUMP :D
+
+
+
+Ensemble specific notes:
+{'n_estimators': 750, 'max_features': 'auto', 'max_depth': 25, 'criterion': 'entropy', 'class_weight': 'balanced_subsample', 'bootstrap': True}
+Smaller jump, but still an improvement
