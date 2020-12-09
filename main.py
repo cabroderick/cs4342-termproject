@@ -31,9 +31,9 @@ def main():
     #pick_best_ens(red_wine)
 
     # Finalized classifier calls
-    #knn_classifier(red_wine, 50)
-    #ensemble_classifier(red_wine)
-    #svm_classifier(red_wine)
+    knn_classifier(red_wine, 50)
+    ensemble_classifier(red_wine)
+    svm_classifier(red_wine)
 
 
 # prints the weight of each of the predictors
@@ -121,7 +121,7 @@ def pick_best_knn(dataset, n_neighbors):
 def knn_classifier(dataset, n_neighbors):
     # train-test split
     X_train, X_test, y_train, y_test = tt_split_knn(dataset, 42)
-
+    
     # instantiate the model with 5 neighbors
     knn = sk.neighbors.KNeighborsClassifier(n_neighbors, weights='distance', leaf_size=2, algorithm='brute')
     # fit the model on the training data
@@ -129,6 +129,9 @@ def knn_classifier(dataset, n_neighbors):
     # see how the model performs
     print("KNN Score: {}".format(knn.score(X_test, y_test)))
 
+    quality = knn.predict(X_test) # run the predictor on the test dataset and store results in array
+    X_test['quality'] = quality # append column to test dataset
+    X_test.to_csv('knn.csv', index=False) # write to csv
 
 # ENSEMBLE ------------------------------------------- #
 # evalute hyper-parameters
@@ -165,6 +168,10 @@ def ensemble_classifier(dataset):
     new_ens.fit(X_train, y_train)
     print("New Ensemble score: {}".format(new_ens.score(X_test, y_test)))
 
+    quality = new_ens.predict(X_test) # run the predictor on the test dataset and store results in array
+    X_test['quality'] = quality # append column to test dataset
+    X_test.to_csv('ensemble.csv', index=False) # write to csv
+
 
 # SVM ------------------------------------------------ #
 def svm_classifier(dataset):
@@ -175,7 +182,9 @@ def svm_classifier(dataset):
     svm = sk.svm.SVC(kernel='linear')
     svm.fit(X_train, y_train)
     print("SVM Score: {}".format(svm.score(X_test, y_test)))
-
+    quality = svm.predict(X_test) # run the predictor on the test dataset and store results in array
+    X_test['quality'] = quality # append column to test dataset
+    X_test.to_csv('svm.csv', index=False) # write to csv
 
 if __name__ == "__main__":
     main()
