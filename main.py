@@ -21,23 +21,29 @@ def main():
     white_wine = pd.read_csv(str(cwd) + "/winequality-white.csv", delimiter=";")
 
     # print the predictors
-    #print_individual_predictors(red_wine)
-    #print_individual_predictors(white_wine)
+    #print_individual_predictors(red_wine, "Red Wine")
+    #print_individual_predictors(white_wine, "White Wine")
 
     # run the classifiers
 
     # HYPERPARAMETER TUNING -----
-    #pick_best_knn(red_wine, 50)
+    #pick_best_knn(red_wine)
     #pick_best_ens(red_wine)
 
     # Finalized classifier calls
-    knn_classifier(red_wine, 50)
-    ensemble_classifier(red_wine)
-    svm_classifier(red_wine)
+    print("Red wine dataset results:")
+    knn_classifier(dataset=red_wine, dataset_name="red")
+    ensemble_classifier(red_wine, "red")
+    svm_classifier(red_wine, "red")
+
+    print("White wine dataset results")
+    knn_classifier(white_wine, "white")
+    ensemble_classifier(white_wine, "white")
+    svm_classifier(white_wine, "white")
 
 
 # prints the weight of each of the predictors
-def print_individual_predictors(dataset):
+def print_individual_predictors(dataset, dataset_name):
     predictors = dataset.columns
     quality = dataset["quality"]
     results = []
@@ -62,7 +68,7 @@ def print_individual_predictors(dataset):
     plt.bar(x_pos, results, color='purple')
     plt.xlabel("Predictors")
     plt.ylabel("Quality")
-    plt.title("Predictors vs Quality")
+    plt.title("Predictors vs Quality for "+dataset_name)
 
     plt.xticks(x_pos, x, rotation='vertical')
 
@@ -102,7 +108,8 @@ def tt_split_knn(dataset, rs):
     return X_train, X_test, y_train, y_test
 
 
-def pick_best_knn(dataset, n_neighbors):
+def pick_best_knn(dataset):
+    n_neighbors = 50
     X_train, X_test, y_train, y_test = tt_split_knn(dataset, 42)
 
     knn = sk.neighbors.KNeighborsClassifier(n_neighbors)
@@ -118,7 +125,8 @@ def pick_best_knn(dataset, n_neighbors):
     print(search.best_score_)
 
 
-def knn_classifier(dataset, n_neighbors):
+def knn_classifier(dataset, dataset_name):
+    n_neighbors = 50
     # train-test split
     X_train, X_test, y_train, y_test = tt_split_knn(dataset, 42)
     
@@ -131,7 +139,7 @@ def knn_classifier(dataset, n_neighbors):
 
     quality = knn.predict(X_test) # run the predictor on the test dataset and store results in array
     X_test['quality'] = quality # append column to test dataset
-    X_test.to_csv('knn.csv', index=False) # write to csv
+    X_test.to_csv('./results/knn_'+dataset_name+'.csv', index=False) # write to csv
 
 # ENSEMBLE ------------------------------------------- #
 # evalute hyper-parameters
@@ -155,7 +163,7 @@ def pick_best_ens(dataset):
 
 
 # perform ensemble classification
-def ensemble_classifier(dataset):
+def ensemble_classifier(dataset, dataset_name):
     # train-test split
     X_train, X_test, y_train, y_test = tt_split(dataset, 50)
 
@@ -170,11 +178,11 @@ def ensemble_classifier(dataset):
 
     quality = new_ens.predict(X_test) # run the predictor on the test dataset and store results in array
     X_test['quality'] = quality # append column to test dataset
-    X_test.to_csv('ensemble.csv', index=False) # write to csv
+    X_test.to_csv('./results/ensemble_'+dataset_name+'.csv', index=False) # write to csv
 
 
 # SVM ------------------------------------------------ #
-def svm_classifier(dataset):
+def svm_classifier(dataset, dataset_name):
     # train-test split
     X_train, X_test, y_train, y_test = tt_split(dataset, 50)
 
@@ -184,7 +192,7 @@ def svm_classifier(dataset):
     print("SVM Score: {}".format(svm.score(X_test, y_test)))
     quality = svm.predict(X_test) # run the predictor on the test dataset and store results in array
     X_test['quality'] = quality # append column to test dataset
-    X_test.to_csv('svm.csv', index=False) # write to csv
+    X_test.to_csv('./results/svm_'+dataset_name+'.csv', index=False) # write to csv
 
 if __name__ == "__main__":
     main()
