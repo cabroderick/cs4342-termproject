@@ -138,8 +138,8 @@ def knn_classifier(dataset, dataset_name):
     print("KNN Score: {}".format(knn.score(X_test, y_test)))
 
     quality = knn.predict(X_test) # run the predictor on the test dataset and store results in array
-    X_test['quality'] = quality # append column to test dataset
-    X_test.to_csv('./results/knn_'+dataset_name+'.csv', index=False) # write to csv
+    results = pd.DataFrame(data=quality)
+    results.to_csv('./results/knn_'+dataset_name+'.csv', index=False) # write to csv
 
 # ENSEMBLE ------------------------------------------- #
 # evalute hyper-parameters
@@ -177,8 +177,8 @@ def ensemble_classifier(dataset, dataset_name):
     print("New Ensemble score: {}".format(new_ens.score(X_test, y_test)))
 
     quality = new_ens.predict(X_test) # run the predictor on the test dataset and store results in array
-    X_test['quality'] = quality # append column to test dataset
-    X_test.to_csv('./results/ensemble_'+dataset_name+'.csv', index=False) # write to csv
+    results = pd.DataFrame(data=quality)
+    results.to_csv('./results/ensemble_'+dataset_name+'.csv', index=False) # write to csv
 
 
 # SVM ------------------------------------------------ #
@@ -191,8 +191,8 @@ def svm_classifier(dataset, dataset_name):
     svm.fit(X_train, y_train)
     print("SVM Score: {}".format(svm.score(X_test, y_test)))
     quality = svm.predict(X_test) # run the predictor on the test dataset and store results in array
-    X_test['quality'] = quality # append column to test dataset
-    X_test.to_csv('./results/svm_'+dataset_name+'.csv', index=False) # write to csv
+    results = pd.DataFrame(data=quality)
+    results.to_csv('./results/svm_'+dataset_name+'.csv', index=False) # write to csv
 
 if __name__ == "__main__":
     main()
