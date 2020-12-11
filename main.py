@@ -36,7 +36,7 @@ def main():
     ensemble_classifier(red_wine, "red")
     svm_classifier(red_wine, "red")
 
-    print("White wine dataset results")
+    print("\n\nWhite wine dataset results")
     knn_classifier(white_wine, "white")
     ensemble_classifier(white_wine, "white")
     svm_classifier(white_wine, "white")
@@ -79,6 +79,7 @@ def print_individual_predictors(dataset, dataset_name):
 def tt_split(dataset, rs):
     X = dataset.drop(columns=["quality"])
     y = dataset["quality"]
+
     X_train, X_test, y_train, y_test = sk.model_selection.train_test_split(X, y, random_state=rs)
     return X_train, X_test, y_train, y_test
 
@@ -87,23 +88,23 @@ def tt_split(dataset, rs):
 def tt_split_knn(dataset, rs):
     df_model = dataset.copy()
 
-    # does data need cleaning?
-    # If so, do cleaning, or delete this
-
     # Scale data to improve accuracy
     scaler = MinMaxScaler()
-    features = ["fixed acidity", "volatile acidity", "density", "pH", "sulphates", "alcohol"]
+    features = ["fixed acidity", "density", "pH", "sulphates", "alcohol"]
     for feature in features:
         try:
             df_model[feature] = scaler.fit_transform(df_model[feature])
         except:
             df_model[feature] /= df_model[feature].max()
 
-    # Maybe prune that shit??
-
     X = df_model.drop(columns=["citric acid", "residual sugar", "chlorides", "free sulfur dioxide",
-                               "total sulfur dioxide", "quality"])
+                               "total sulfur dioxide", "volatile acidity", "quality"])
     y = df_model["quality"]
+
+    pca = PCA()
+    pca.fit(X)
+    X = pca.transform(X)
+
     X_train, X_test, y_train, y_test = sk.model_selection.train_test_split(X, y, random_state=rs)
     return X_train, X_test, y_train, y_test
 
@@ -138,8 +139,8 @@ def knn_classifier(dataset, dataset_name):
     print("KNN Score: {}".format(knn.score(X_test, y_test)))
 
     quality = knn.predict(X_test) # run the predictor on the test dataset and store results in array
-    results = pd.DataFrame(data=quality)
-    results.to_csv('./results/knn_'+dataset_name+'.csv', index=False) # write to csv
+    #results = pd.DataFrame(data=quality)
+    #results.to_csv('./results/knn_'+dataset_name+'.csv', index=False) # write to csv
 
 # ENSEMBLE ------------------------------------------- #
 # evalute hyper-parameters
@@ -177,8 +178,8 @@ def ensemble_classifier(dataset, dataset_name):
     print("New Ensemble score: {}".format(new_ens.score(X_test, y_test)))
 
     quality = new_ens.predict(X_test) # run the predictor on the test dataset and store results in array
-    results = pd.DataFrame(data=quality)
-    results.to_csv('./results/ensemble_'+dataset_name+'.csv', index=False) # write to csv
+    #results = pd.DataFrame(data=quality)
+    #results.to_csv('./results/ensemble_'+dataset_name+'.csv', index=False) # write to csv
 
 
 # SVM ------------------------------------------------ #
@@ -191,8 +192,8 @@ def svm_classifier(dataset, dataset_name):
     svm.fit(X_train, y_train)
     print("SVM Score: {}".format(svm.score(X_test, y_test)))
     quality = svm.predict(X_test) # run the predictor on the test dataset and store results in array
-    results = pd.DataFrame(data=quality)
-    results.to_csv('./results/svm_'+dataset_name+'.csv', index=False) # write to csv
+    #results = pd.DataFrame(data=quality)
+    #results.to_csv('./results/svm_'+dataset_name+'.csv', index=False) # write to csv
 
 if __name__ == "__main__":
     main()
